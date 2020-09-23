@@ -13,6 +13,8 @@ namespace UserMaintenance
 {
     public partial class Form1 : Form
     {
+        BindingList<User> users = new BindingList<User>();
+
         public Form1()
         {
             InitializeComponent();
@@ -20,6 +22,20 @@ namespace UserMaintenance
             lblFirstName.Text = ResourceFile_1.FirstName;
             btnAdd.Text = ResourceFile_1.Add;
 
+            listUsers.DataSource = users;
+            listUsers.ValueMember = "ID";
+            listUsers.DisplayMember = "FullName";
+
+        }
+
+        public void btnAdd_Click(object sender, EventArgs e)
+        {
+            var u = new User()
+            {
+                LastName = txtLastName.Text,
+                FirstName = txtFirstName.Text
+            };
+            users.Add(u);
         }
     }
 }
