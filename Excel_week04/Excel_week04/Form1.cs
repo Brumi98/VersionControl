@@ -64,7 +64,8 @@ namespace Excel_week04
 
             }   
         }
-        private void CreateTable()
+
+        public void CreateTable()
         {
 
             string[] headers = new string[]
@@ -112,6 +113,29 @@ namespace Excel_week04
             xlSheet.get_Range(
                         GetCell(2, 1),
                         GetCell(1 + values.GetLength(0), values.GetLength(1))).Value2 = values;
+
+            Excel.Range headerRange = xlSheet.get_Range(GetCell(1, 1), GetCell(1, headers.Length));
+            headerRange.Font.Bold = true;
+            headerRange.VerticalAlignment = Excel.XlVAlign.xlVAlignCenter;
+            headerRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+            headerRange.EntireColumn.AutoFit();
+            headerRange.RowHeight = 40;
+            headerRange.Interior.Color = Color.LightBlue;
+            headerRange.BorderAround2(Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThick);
+
+            int lastRowID = xlSheet.UsedRange.Rows.Count;
+            int lastColumID = xlSheet.UsedRange.Columns.Count;
+
+            Excel.Range teljesRange = xlSheet.get_Range(GetCell(2, 1),GetCell(lastRowID, lastColumID));
+            teljesRange.BorderAround2(Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThick);
+
+            Excel.Range utolsoRange = xlSheet.get_Range(GetCell(2, 9), GetCell(lastRowID, lastColumID));
+            utolsoRange.Interior.Color = Color.LightGreen;
+
+            Excel.Range elsoRange = xlSheet.get_Range(GetCell(2, 1), GetCell(lastRowID, 1));
+            elsoRange.Font.Bold = true;
+            elsoRange.Interior.Color = Color.LightYellow;
+
         }
         private string GetCell(int x, int y)
         {
@@ -130,6 +154,5 @@ namespace Excel_week04
             return ExcelCoordinate;
 
         }
-
     }
 }
