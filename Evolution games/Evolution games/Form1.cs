@@ -17,38 +17,115 @@ namespace Evolution_games
         GameArea ga;
         int populationSize = 100;
         int nbrOfSteps = 10;
-        int nbrofStepsIncrement = 10;
+        int nbrOfStepsIncrement = 10;
         int generation = 1;
+        Brain winnerBrain = null;
 
         public Form1()
         {
             InitializeComponent();
+            
+            
+            ga = gc.ActivateDisplay();
+            this.Controls.Add(ga);
+
+            gc.GameOver += Gc_GameOver1;
+            for (int i = 0; i < populationSize; i++)
+            {
+                gc.AddPlayer(nbrOfSteps);
+            }            
+            gc.Start();
+        }
+
+        private void Gc_GameOver1(object sender)
+        {
+
+            generation++;
+            label1.Text = string.Format("{0}. generáció", generation);
 
             var playerList = from p in gc.GetCurrentPlayers()
                              orderby p.GetFitness() descending
                              select p;
             var topPerformers = playerList.Take(populationSize / 2).ToList();
 
-            gc.GameOver += Gc_GameOver;
+            gc.ResetCurrentLevel();
 
-            for (int i = 0; i < populationSize; i++)
+            var winners = from p in topPerformers
+                          where p.IsWinner
+                          select p;
+
+            if (winners.Count() > 0)
             {
-                gc.AddPlayer(nbrOfSteps);
-            }            
+                winnerBrain = winners.FirstOrDefault().Brain.Clone();
+                gc.GameOver -= Gc_GameOver1;
+                return;
+            }
+            foreach (var p in topPerformers)
+            {
+                var b = p.Brain.Clone();
+                if (generation % 3 == 0)
+                    gc.AddPlayer(b.ExpandBrain(nbrOfStepsIncrement));
+                else
+                    gc.AddPlayer(b);
+
+                if (generation % 3 == 0)
+                    gc.AddPlayer(b.Mutate().ExpandBrain(nbrOfStepsIncrement));
+                else
+                    gc.AddPlayer(b.Mutate());
+            }
+
             gc.Start();
-            ga = gc.ActivateDisplay();
-            this.Controls.Add(ga);
 
         }
 
-        private void Gc_GameOver(object sender)
+        //private void Gc_GameOver(object sender)
+        //{
+
+        //    generation++;
+        //    label1.Text = string.Format("{0}. generáció", generation);
+
+        //    var playerList = from p in gc.GetCurrentPlayers()
+        //                     orderby p.GetFitness() descending
+        //                     select p;
+        //    var topPerformers = playerList.Take(populationSize / 2).ToList();
+            
+        //    gc.ResetCurrentLevel();
+
+        //    var winners = from p in topPerformers
+        //                  where p.IsWinner
+        //                  select p;
+
+        //    if (winners.Count() > 0)
+        //    {
+        //        winnerBrain = winners.FirstOrDefault().Brain.Clone();
+        //        gc.GameOver -= Gc_GameOver;
+        //        return;
+        //    }
+        //    foreach (var p in topPerformers)
+        //    {
+        //        var b = p.Brain.Clone();
+        //        if (generation % 3 == 0)
+        //            gc.AddPlayer(b.ExpandBrain(nbrOfStepsIncrement));
+        //        else
+        //            gc.AddPlayer(b);
+
+        //        if (generation % 3 == 0)
+        //            gc.AddPlayer(b.Mutate().ExpandBrain(nbrOfStepsIncrement));
+        //        else
+        //            gc.AddPlayer(b.Mutate());
+        //    }
+
+        //    gc.Start();
+
+        //}
+
+        private void button1_Click(object sender, EventArgs e)
         {
-
-            generation++;
-            label1.Text = string.Format("{0}. generáció", generation);
-
+            gc.ResetCurrentLevel();
+            gc.AddPlayer(winnerBrain.Clone());
+            gc.AddPlayer();
+            ga.Focus();
+            gc.Start(true);
         }
-
-        
     }
 }
