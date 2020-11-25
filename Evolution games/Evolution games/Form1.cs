@@ -15,11 +15,20 @@ namespace Evolution_games
     {
         GameController gc = new GameController();
         GameArea ga;
+        int populationSize = 100;
+        int nbrOfSteps = 10;
+        int nbrofStepsIncrement = 10;
+        int generation = 1;
 
         public Form1()
         {
             InitializeComponent();
 
+            for (int i = 0; i < populationSize; i++)
+            {
+                gc.AddPlayer(nbrOfSteps);
+            }            
+            gc.Start();
             ga = gc.ActivateDisplay();
             this.Controls.Add(ga);
         }
